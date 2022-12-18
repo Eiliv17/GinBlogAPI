@@ -18,7 +18,7 @@ func main() {
 	{
 		v1.POST("/signup", controllers.Signup)
 
-		//v1.POST("/login", loginEndpoint)
+		v1.POST("/login", controllers.Login)
 	}
 
 	r.Run() // listen and serve on port specified by PORT env var

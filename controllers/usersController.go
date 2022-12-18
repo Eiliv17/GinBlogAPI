@@ -9,11 +9,13 @@ import (
 	"github.com/Eiliv17/GinJWTAuthAPI/initializers"
 	"github.com/Eiliv17/GinJWTAuthAPI/models"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v4"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 )
 
+// signup controller
 func Signup(c *gin.Context) {
 	// database setup
 	dbname := os.Getenv("DB_NAME")
@@ -89,5 +91,75 @@ func Signup(c *gin.Context) {
 	// respond
 	c.IndentedJSON(http.StatusOK, gin.H{
 		"result": "user created successfully",
+	})
+}
+
+// login controller
+func Login(c *gin.Context) {
+	// database setup
+	dbname := os.Getenv("DB_NAME")
+	coll := initializers.DB.Database(dbname).Collection("users")
+
+	// get the email and pass off req body
+	body := struct {
+		Email    string `json:"email" binding:"required"`
+		Password string `json:"password" binding:"required"`
+	}{}
+
+	err := c.BindJSON(&body)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "failed to read body",
+		})
+		return
+	}
+
+	// look up requested user
+	emailFilter := bson.D{primitive.E{Key: "email", Value: body.Email}}
+	result := coll.FindOne(context.TODO(), emailFilter)
+
+	// decode result
+	var user models.User
+	err = result.Decode(&user)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "invalid email or password",
+		})
+		return
+	}
+
+	// compare sent pass with saved user pass hash
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(body.Password))
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "invalid email or password",
+		})
+		return
+	}
+
+	// generate JWT token
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"userID": user.UserID.Hex(),
+		"exp":    time.Now().Add(time.Hour).Unix(),
+	})
+
+	// Sign and get the complete encoded token as a string using the secret
+	HMACSecret := os.Getenv("HMAC_SECRET")
+
+	tokenString, err := token.SignedString([]byte(HMACSecret))
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "failed to create token",
+		})
+		return
+	}
+
+	// set token as cookie
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie("Authorization", tokenString, 3600, "", "", false, true)
+
+	// send the JWT token
+	c.IndentedJSON(http.StatusOK, gin.H{
+		"result": "logged in successfully",
 	})
 }
