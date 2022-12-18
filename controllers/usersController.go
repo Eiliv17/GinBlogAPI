@@ -163,3 +163,10 @@ func Login(c *gin.Context) {
 		"result": "logged in successfully",
 	})
 }
+
+// validation
+func Validate(c *gin.Context) {
+	c.IndentedJSON(http.StatusOK, gin.H{
+		"message": "I'm logged in",
+	})
+}

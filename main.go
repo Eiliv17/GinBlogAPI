@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/Eiliv17/GinJWTAuthAPI/controllers"
 	"github.com/Eiliv17/GinJWTAuthAPI/initializers"
+	"github.com/Eiliv17/GinJWTAuthAPI/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,6 +20,12 @@ func main() {
 		v1.POST("/signup", controllers.Signup)
 
 		v1.POST("/login", controllers.Login)
+
+	}
+
+	website := r.Group("")
+	{
+		website.GET("/validate", middleware.RequireAuth, controllers.Validate)
 	}
 
 	r.Run() // listen and serve on port specified by PORT env var
