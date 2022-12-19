@@ -15,17 +15,28 @@ func init() {
 func main() {
 	r := gin.Default()
 
-	v1 := r.Group("/user")
+	userr := r.Group("/user")
 	{
-		v1.POST("/signup", controllers.Signup)
+		userr.POST("/signup", controllers.Signup)
 
-		v1.POST("/login", controllers.Login)
+		userr.POST("/login", controllers.Login)
 
 	}
 
-	website := r.Group("")
+	blog := r.Group("")
 	{
-		website.GET("/validate", middleware.RequireAuth, controllers.Validate)
+		// authenticated test route
+		blog.GET("/validate", middleware.RequireAuth, controllers.Validate)
+
+		// default blog routes
+		blog.GET("/posts", controllers.GetPosts)
+
+		blog.GET("/posts/:id", controllers.GetPost)
+
+		// authenticated blog routes routes
+		blog.POST("/posts", middleware.RequireAuth, controllers.CreatePost)
+
+		/* blog.DELETE("/posts", middleware.RequireAuth, controllers.DeletePost)  */
 	}
 
 	r.Run() // listen and serve on port specified by PORT env var
