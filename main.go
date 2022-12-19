@@ -23,20 +23,20 @@ func main() {
 
 	}
 
-	blog := r.Group("")
+	// authenticated test route
+	r.GET("/validate", middleware.RequireAuth, controllers.Validate)
+
+	blog := r.Group("/posts")
 	{
-		// authenticated test route
-		blog.GET("/validate", middleware.RequireAuth, controllers.Validate)
-
 		// default blog routes
-		blog.GET("/posts", controllers.GetPosts)
+		blog.GET("", controllers.GetPosts)
 
-		blog.GET("/posts/:id", controllers.GetPost)
+		blog.GET("/:id", controllers.GetPost)
 
 		// authenticated blog routes routes
-		blog.POST("/posts", middleware.RequireAuth, controllers.CreatePost)
+		blog.POST("", middleware.RequireAuth, controllers.CreatePost)
 
-		/* blog.DELETE("/posts", middleware.RequireAuth, controllers.DeletePost)  */
+		blog.DELETE("/:id", middleware.RequireAuth, controllers.DeletePost)
 	}
 
 	r.Run() // listen and serve on port specified by PORT env var

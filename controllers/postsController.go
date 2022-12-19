@@ -134,9 +134,64 @@ func CreatePost(c *gin.Context) {
 	})
 }
 
-/* func DeletePost(c *gin.Context) {
+func DeletePost(c *gin.Context) {
 	// database setup
 	dbname := os.Getenv("DB_NAME")
 	coll := initializers.DB.Database(dbname).Collection("posts")
 
-}  */
+	// get post id parameter
+	postID := c.Param("id")
+
+	objID, err := primitive.ObjectIDFromHex(postID)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "invalid post id",
+		})
+		return
+	}
+
+	// get user info from context
+	rawvalue, exist := c.Get("user")
+	if !exist {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "not authorized",
+		})
+		return
+	}
+
+	user := rawvalue.(models.User)
+
+	// retrieve post from database
+	filter := bson.D{primitive.E{Key: "_id", Value: objID}}
+	result := coll.FindOne(context.TODO(), filter)
+
+	var post models.Post
+	err = result.Decode(&post)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "post not found",
+		})
+		return
+	}
+
+	// check for post author
+	if post.AuthorID != user.UserID {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "you're not the author of the post",
+		})
+		return
+	}
+
+	// delete post
+	_, err = coll.DeleteOne(context.TODO(), filter)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "post not found",
+		})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, gin.H{
+		"result": "post deleted",
+	})
+}
