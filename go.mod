@@ -1,4 +1,4 @@
-module github.com/Eiliv17/GinJWTAuthAPI
+module github.com/Eiliv17/GinBlogAPI
 
 go 1.19
 

@@ -7,8 +7,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/Eiliv17/GinJWTAuthAPI/initializers"
-	"github.com/Eiliv17/GinJWTAuthAPI/models"
+	"github.com/Eiliv17/GinBlogAPI/initializers"
+	"github.com/Eiliv17/GinBlogAPI/models"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 	"go.mongodb.org/mongo-driver/bson"

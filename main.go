@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/Eiliv17/GinJWTAuthAPI/controllers"
-	"github.com/Eiliv17/GinJWTAuthAPI/initializers"
-	"github.com/Eiliv17/GinJWTAuthAPI/middleware"
+	"github.com/Eiliv17/GinBlogAPI/controllers"
+	"github.com/Eiliv17/GinBlogAPI/initializers"
+	"github.com/Eiliv17/GinBlogAPI/middleware"
 	"github.com/gin-gonic/gin"
 )
 
