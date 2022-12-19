@@ -69,12 +69,12 @@ func GetPost(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, post)
 }
 
-func CreatePost(c *gin.Context) {
+/* func CreatePost(c *gin.Context) {
 	// database setup
 	dbname := os.Getenv("DB_NAME")
 	coll := initializers.DB.Database(dbname).Collection("posts")
 
-}
+} */
 
 /* func DeletePost(c *gin.Context) {
 	// database setup

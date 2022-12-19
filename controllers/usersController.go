@@ -166,6 +166,19 @@ func Login(c *gin.Context) {
 
 // validation
 func Validate(c *gin.Context) {
+
+	rawvalue, exist := c.Get("user")
+	if !exist {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "not authorized",
+		})
+		return
+	}
+
+	user := rawvalue.(models.User)
+
+	user.UserID.Hex()
+
 	c.IndentedJSON(http.StatusOK, gin.H{
 		"message": "I'm logged in",
 	})

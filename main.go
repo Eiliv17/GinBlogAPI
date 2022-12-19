@@ -34,7 +34,7 @@ func main() {
 		blog.GET("/posts/:id", controllers.GetPost)
 
 		// authenticated blog routes routes
-		blog.POST("/posts", middleware.RequireAuth, controllers.CreatePost)
+		/* blog.POST("/posts", middleware.RequireAuth, controllers.CreatePost) */
 
 		/* blog.DELETE("/posts", middleware.RequireAuth, controllers.DeletePost)  */
 	}
