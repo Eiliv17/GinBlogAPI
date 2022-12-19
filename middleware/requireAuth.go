@@ -67,6 +67,9 @@ func RequireAuth(c *gin.Context) {
 			return
 		}
 
+		// attach user to the context
+		c.Set("user", user)
+
 		// continue
 		c.Next()
 
